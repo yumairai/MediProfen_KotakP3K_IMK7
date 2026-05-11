@@ -2302,7 +2302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 242e1a698d6d8b54f9c235610434d25b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MediProfen.UI.MenuScenarioSelector
-  database: {fileID: 11400000, guid: aadac4345e9d0fd419df33df958f17c9, type: 2}
+  database: {fileID: 11400000, guid: 38356b6bc3e2bb143baee8dabb2e8845, type: 2}
   titleText: {fileID: 372367993}
   descriptionText: {fileID: 1698090751}
 --- !u!1 &1694620168

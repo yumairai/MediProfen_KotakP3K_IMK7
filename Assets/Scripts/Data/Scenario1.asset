@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e88c10cda85cc243a98cf9bd7752fe8, type: 3}
+  m_Name: Scenario1
+  m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Data.ScenarioData
+  scenarioId: 001
+  displayName: Simulasi CPR
+  description: Ada seseorang yang tidak sadarkan diri di dalam kelas. Lakukan CPR
+    agar korban kembali terbangun.
+  sceneName: Scenario1
+  objectives:
+  - {fileID: 11400000, guid: cfb67aefda452cd4093e0643813b3607, type: 2}
+  - {fileID: 11400000, guid: 032083b1c45a46e4a9d36e6f6f142af8, type: 2}
