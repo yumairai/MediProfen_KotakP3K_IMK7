@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcb36d424cbffd84cbebfdb25e470f0d, type: 3}
-  m_Name: Objective 001-A
+  m_Name: LakukanCPR
   m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Data.ObjectiveData
-  objectiveId: 001-A
-  title: Pasang Masker CPR
-  description: Pasang masker CPR ke hidung dan mulut korban sebelum melakukan CPR.
+  objectiveId: LakukanCPR
+  title: Lakukan CPR sebanyak 30 kali.
+  description: bebas enjoy
   completionType: 3
-  targetId: 
+  targetId: CPR
