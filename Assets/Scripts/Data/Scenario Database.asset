@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Data.ScenarioDatabase
   scenarios:
   - {fileID: 11400000, guid: 3b6ec8f858355414f8451304cda999a8, type: 2}
+  - {fileID: 11400000, guid: 740d1e8ba0cdabe44924fa07512d3b0f, type: 2}
