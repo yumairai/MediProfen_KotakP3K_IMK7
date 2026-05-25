@@ -291,6 +291,7 @@ namespace MediProfen.Interactions
 
         private void UpdateGrabAndPump()
         {
+            if (isCprComplete) return;
             float currentAverageY = GetAverageY();
             // displacement bernilai positif jika tangan ditekan ke bawah (Y mengecil)
             float displacement = grabStartAverageY - currentAverageY;
@@ -343,6 +344,7 @@ namespace MediProfen.Interactions
                     if (currentCompressions >= requiredCompressions)
                     {
                         CompleteCPR();
+                        return;
                     }
                 }
             }
@@ -411,6 +413,12 @@ namespace MediProfen.Interactions
                 counterText.gameObject.SetActive(false);
             }
 
+            if (chestAnimator != null)
+            {
+                chestAnimator.speed = 1f;
+                chestAnimator.SetTrigger("CPRDone");
+                Debug.Log("[CPRManager] CPRDone Triggered.");
+            }
             ObjectiveEvents.RaiseTargetCompleted(cprObjectiveTargetId, completionType);
         }
     }
