@@ -83,7 +83,7 @@ namespace MediProfen.UI
 
             if (statusText != null)
             {
-                statusText.text = scenarioCompleted ? "<color=green>COMPLETED</color>" : "<color=yellow>IN PROGRESS</color>";
+                statusText.text = scenarioCompleted ? "<color=green>SELESAI</color>" : "<color=yellow>SEDANG BERJALAN</color>";
             }
         }
 
