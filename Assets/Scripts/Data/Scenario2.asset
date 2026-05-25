@@ -17,4 +17,8 @@ MonoBehaviour:
   description: Ada seseorang yang tersedak saat sedang makan, lakukan Heimlich Maneuver
     untuk menyelamatkan korban.
   sceneName: Scenario2
-  objectives: []
+  objectives:
+  - {fileID: 11400000, guid: a9edbd1130600b140b66cc5bebc734b8, type: 2}
+  - {fileID: 11400000, guid: 8d4474b715d42b34c8a205f0c3d87caa, type: 2}
+  - {fileID: 11400000, guid: cc572e73cbf66a549a17daa8b605b65e, type: 2}
+  - {fileID: 11400000, guid: 7581c214a9b912642984688ee732eaea, type: 2}

@@ -78,7 +78,7 @@ namespace MediProfen.UI
 
             if (progressText != null)
             {
-                progressText.text = $"Progress: {Mathf.Clamp(currentObjectiveIndex, 0, totalObjectives)} / {totalObjectives}";
+                progressText.text = $"Progress: {Mathf.Clamp(currentObjectiveIndex, 0, totalObjectives)-1} / {totalObjectives}";
             }
 
             if (statusText != null)
