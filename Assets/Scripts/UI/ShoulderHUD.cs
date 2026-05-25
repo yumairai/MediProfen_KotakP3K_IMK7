@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace MediProfen.UI
 {
+    [RequireComponent(typeof(UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable))]
     public class ShoulderHUD : MonoBehaviour
     {
         [Header("References")]
@@ -15,8 +17,12 @@ namespace MediProfen.UI
         [Tooltip("Sudut rotasi offset (jika tablet perlu dimiringkan menghadap wajah)")]
         public Vector3 rotationOffset = new Vector3(0, 30f, 0);
 
-        [Tooltip("Kecepatan tablet mengikuti putaran badan (0 = instan, nilai kecil = lebih lambat/halus)")]
+        [Tooltip("Kecepatan tablet mengikuti putaran badan")]
         public float smoothSpeed = 8f;
+
+        private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable;
+        private Rigidbody rb;
+        private bool isGrabbed = false;
 
         private void Start()
         {
@@ -31,14 +37,63 @@ namespace MediProfen.UI
                     Debug.LogWarning("[ShoulderHUD] vrCamera belum di-assign!");
                 }
             }
+
+            // Ambil komponen grab dan rigidbody
+            grabInteractable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+            rb = GetComponent<Rigidbody>();
+
+            if (rb != null)
+            {
+                // Tablet melayang, jadi matikan gravitasi dan jadikan kinematic secara default
+                rb.useGravity = false;
+                rb.isKinematic = true;
+            }
+
+            if (grabInteractable != null)
+            {
+                // Mendaftarkan event saat tablet dipegang dan dilepas
+                grabInteractable.selectEntered.AddListener(OnGrabbed);
+                grabInteractable.selectExited.AddListener(OnReleased);
+
+                // Rekomendasi: Gunakan Kinematic agar pergerakannya mulus dan tidak bertabrakan aneh dengan tembok
+                grabInteractable.movementType = UnityEngine.XR.Interaction.Toolkit.Interactables.XRBaseInteractable.MovementType.Kinematic;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (grabInteractable != null)
+            {
+                grabInteractable.selectEntered.RemoveListener(OnGrabbed);
+                grabInteractable.selectExited.RemoveListener(OnReleased);
+            }
+        }
+
+        private void OnGrabbed(SelectEnterEventArgs args)
+        {
+            isGrabbed = true;
+            // Saat dipegang, kita berhenti memaksa posisi ke bahu agar controller bebas membawanya
+        }
+
+        private void OnReleased(SelectExitEventArgs args)
+        {
+            isGrabbed = false;
+            // Hapus sisa lemparan / momentum
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
         }
 
         private void LateUpdate()
         {
             if (vrCamera == null) return;
 
+            // Jika sedang dipegang oleh player, biarkan XRGrabInteractable yang memindahkan posisinya ke tangan!
+            if (isGrabbed) return;
+
             // 1. Dapatkan rotasi Yaw (kiri-kanan) dari kamera. 
-            // Kita abaikan rotasi Pitch (atas-bawah) dan Roll (miring) agar orientasi tablet selalu tegak.
             Vector3 cameraEuler = vrCamera.eulerAngles;
             Quaternion bodyYawRotation = Quaternion.Euler(0, cameraEuler.y, 0);
 
@@ -48,16 +103,14 @@ namespace MediProfen.UI
             // 3. Tentukan target rotasi (mengarah searah badan + kemiringan tambahan agar menghadap tengah)
             Quaternion targetRotation = bodyYawRotation * Quaternion.Euler(rotationOffset);
 
-            // 4. Terapkan pergerakan
+            // 4. Terapkan pergerakan untuk kembali ke bahu / mengikuti bahu
             if (smoothSpeed <= 0f)
             {
-                // Bergerak secara instan
                 transform.position = targetPosition;
                 transform.rotation = targetRotation;
             }
             else
             {
-                // Bergerak dengan efek 'Lazy Follow' yang mulus
                 transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * smoothSpeed);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothSpeed);
             }
