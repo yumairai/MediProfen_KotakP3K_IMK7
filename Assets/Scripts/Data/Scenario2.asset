@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e88c10cda85cc243a98cf9bd7752fe8, type: 3}
+  m_Name: Scenario2
+  m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Data.ScenarioData
+  scenarioId: 002
+  displayName: 'Simulasi Heimlich Maneuver '
+  description: Ada seseorang yang tersedak saat sedang makan, lakukan Heimlich Maneuver
+    untuk menyelamatkan korban.
+  sceneName: Scenario2
+  objectives:
+  - {fileID: 11400000, guid: a9edbd1130600b140b66cc5bebc734b8, type: 2}
+  - {fileID: 11400000, guid: 8d4474b715d42b34c8a205f0c3d87caa, type: 2}
+  - {fileID: 11400000, guid: cc572e73cbf66a549a17daa8b605b65e, type: 2}
+  - {fileID: 11400000, guid: 7581c214a9b912642984688ee732eaea, type: 2}

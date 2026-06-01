@@ -12,6 +12,9 @@ namespace MediProfen.Objectives
         private ScenarioData currentScenario;
         private int currentIndex = -1;
 
+        public ScenarioData CurrentScenario => currentScenario;
+        public int CurrentIndex => currentIndex;
+
         public ObjectiveData CurrentObjective
         {
             get
