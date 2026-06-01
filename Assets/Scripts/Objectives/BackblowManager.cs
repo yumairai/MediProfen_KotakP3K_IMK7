@@ -42,6 +42,16 @@ namespace MediProfen.Interactions
         [Header("UI Feedback (Optional)")]
         public TextMeshProUGUI counterText;
 
+        [Header("Animation")]
+        [Tooltip("Animator pada model korban")]
+        public Animator victimAnimator;
+        [Tooltip("Nama state animasi di Animator saat dada digrab (contoh: benddown_pose)")]
+        public string bendDownStateName = "benddown_pose";
+        [Tooltip("Nama state animasi di Animator saat dada dilepas (contoh: Idle)")]
+        public string releaseStateName = "Idle";
+        [Tooltip("Nama state animasi di Animator saat punggung dipukul (contoh: hit_pose)")]
+        public string hitStateName = "hit_pose";
+
         private int currentBlows = 0;
         private bool isCompleted = false;
         private float lastStrikeTime = 0f;
@@ -153,12 +163,27 @@ namespace MediProfen.Interactions
                         // Mulai menggenggam
                         hand.isGrabbing = true;
                         LockHandVisual(hand);
+
+                        // Trigger animasi membungkuk
+                        if (victimAnimator != null && !string.IsNullOrEmpty(bendDownStateName))
+                        {
+                            victimAnimator.CrossFade(bendDownStateName, 0.2f);
+                        }
                     }
                     else if (!isGripActive && hand.isGrabbing)
                     {
                         // Lepas genggaman
                         hand.isGrabbing = false;
                         RestoreHandVisual(hand);
+
+                        // Jika tidak ada tangan lain yang sedang menggenggam dada, kembalikan animasi
+                        if (victimAnimator != null && !string.IsNullOrEmpty(releaseStateName))
+                        {
+                            if (!IsChestGrabbed())
+                            {
+                                victimAnimator.CrossFade(releaseStateName, 0.2f);
+                            }
+                        }
                     }
 
                     // Paksa posisi model tangan (visual) agar diam di tempat (menempel dada)
@@ -225,6 +250,13 @@ namespace MediProfen.Interactions
                 lastStrikeTime = Time.time;
                 UpdateCounterUI();
                 TriggerHaptic(strikingHand, 0.8f, 0.15f);
+
+                // Mainkan animasi hentakan (hit)
+                if (victimAnimator != null && !string.IsNullOrEmpty(hitStateName))
+                {
+                    // Memaksa animasi dimainkan dari awal (frame 0) setiap kali dipukul
+                    victimAnimator.Play(hitStateName, 0, 0f);
+                }
 
                 Debug.Log($"[BackblowManager] Backblow sukses! {currentBlows}/{requiredBlows}");
 

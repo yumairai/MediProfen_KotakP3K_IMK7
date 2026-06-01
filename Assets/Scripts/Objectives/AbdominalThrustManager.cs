@@ -27,6 +27,16 @@ namespace MediProfen.Interactions
         [Header("UI Feedback (Optional)")]
         public TextMeshProUGUI counterText;
 
+        [Header("Animation")]
+        [Tooltip("Animator pada model korban")]
+        public Animator victimAnimator;
+        [Tooltip("Nama state animasi saat perut mulai digenggam (opsional)")]
+        public string grabStateName = "";
+        [Tooltip("Nama state animasi saat perut dilepas (opsional)")]
+        public string releaseStateName = "Idle";
+        [Tooltip("Nama state animasi saat ditarik/dihentak sukses (contoh: thrust_hit)")]
+        public string thrustStateName = "thrust_hit";
+
         private int currentThrusts = 0;
         private bool isCompleted = false;
         private float lastThrustTime = 0f;
@@ -203,6 +213,12 @@ namespace MediProfen.Interactions
             
             Debug.Log("[AbdominalThrustManager] Enter grab state - Hands locked to stomach!");
 
+            // Trigger animasi saat bersiap melakukan thrust (opsional)
+            if (victimAnimator != null && !string.IsNullOrEmpty(grabStateName))
+            {
+                victimAnimator.CrossFade(grabStateName, 0.2f);
+            }
+
             foreach (var hand in trackedHands)
             {
                 if (hand.visualObject != null && hand.visualObject != hand.colliderObject)
@@ -227,6 +243,12 @@ namespace MediProfen.Interactions
             isGrabbingStomach = false;
             Debug.Log("[AbdominalThrustManager] Exit grab state - Hands released!");
 
+            // Kembali ke animasi semula (opsional)
+            if (victimAnimator != null && !string.IsNullOrEmpty(releaseStateName))
+            {
+                victimAnimator.CrossFade(releaseStateName, 0.2f);
+            }
+
             foreach (var hand in trackedHands)
             {
                 RestoreHandVisual(hand);
@@ -239,16 +261,10 @@ namespace MediProfen.Interactions
             Vector3 currentAveragePos = GetAveragePos();
             Transform referenceTransform = stomachCollider != null ? stomachCollider.transform : this.transform;
             
-            // Sumbu tarikan Abdominal Thrust adalah ditarik mundur ke arah perut/dada player.
-            // Asumsi transform.forward adalah menghadap ke depan, maka tarikan adalah -forward.
             Vector3 pullAxis = -referenceTransform.forward;
-            
-            // Proyeksikan pergerakan controller fisik ke sumbu tarikan
             Vector3 rawDisplacement = currentAveragePos - grabStartAveragePos;
             float pullAmount = Vector3.Dot(rawDisplacement, pullAxis);
 
-            // Gerakkan tangan visual HANYA pada satu sumbu (pullAxis) agar persis seperti CPR
-            // Tangan tidak akan bergerak liar ke atas/bawah/samping.
             foreach (var hand in trackedHands)
             {
                 if (hand.visualObject != null && hand.visualObject != hand.colliderObject && hand.originalParent != null)
@@ -256,16 +272,12 @@ namespace MediProfen.Interactions
                     if (hand.visualObject.transform.parent != hand.originalParent)
                     {
                         Vector3 worldLockedPos = referenceTransform.TransformPoint(hand.lockLocalPos);
-                        
-                        // Posisi terkunci + pergerakan searah sumbu tarikan sesuai jarak fisik
                         hand.visualObject.transform.position = worldLockedPos + (pullAxis * pullAmount);
                         hand.visualObject.transform.rotation = referenceTransform.rotation * hand.lockLocalRot;
                     }
                 }
             }
 
-            // Abdominal Thrust dihitung SAAT DITARIK, bukan saat dilepas (beda dengan CPR yang menekan)
-            // Jika ditarik sejauh 80% dari target threshold
             if (pullAmount >= pullDistanceThreshold * 0.8f)
             {
                 if (!hasThrustThisCycle)
@@ -279,6 +291,12 @@ namespace MediProfen.Interactions
                         TriggerHapticFeedback(0.8f, 0.2f);
                         Debug.Log($"[AbdominalThrustManager] Thrust Sukses! {currentThrusts}/{requiredThrusts}");
 
+                        // Mainkan animasi hentakan (hit) perut
+                        if (victimAnimator != null && !string.IsNullOrEmpty(thrustStateName))
+                        {
+                            victimAnimator.Play(thrustStateName, 0, 0f);
+                        }
+
                         if (currentThrusts >= requiredThrusts)
                         {
                             CompleteThrust();
@@ -288,7 +306,6 @@ namespace MediProfen.Interactions
             }
             else if (pullAmount <= pullDistanceThreshold * 0.2f)
             {
-                // Reset siklus jika tangan dikembalikan posisinya (maju lagi)
                 hasThrustThisCycle = false;
             }
         }
