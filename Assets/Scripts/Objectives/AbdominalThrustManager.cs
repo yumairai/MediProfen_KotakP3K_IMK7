@@ -136,6 +136,7 @@ namespace MediProfen.Interactions
                     trackedHands.RemoveAt(i);
                 }
             }
+            
 
             // 2. Evaluasi state tangan
             int grabbingHandsCount = 0;
