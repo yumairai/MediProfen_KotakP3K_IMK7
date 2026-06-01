@@ -1558,7 +1558,7 @@ MonoBehaviour:
   objectiveTargetId: AbdominalThrust
   completionType: 3
   stomachCollider: {fileID: 1867933693}
-  requiredThrusts: 5
+  requiredThrusts: 2
   gripThreshold: 0.5
   pullDistanceThreshold: 0.1
   cooldownTime: 0.5
