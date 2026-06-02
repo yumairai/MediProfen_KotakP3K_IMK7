@@ -36,6 +36,24 @@ namespace MediProfen.Interactions
         public string releaseStateName = "Idle";
         [Tooltip("Nama state animasi saat ditarik/dihentak sukses (contoh: thrust_hit)")]
         public string thrustStateName = "thrust_hit";
+        [Tooltip("Nama state animasi saat objektif selesai dan memuntahkan objek")]
+        public string vomitStateName = "vomit_pose";
+
+        [Header("Choking Object Spawner (Selesai Objective)")]
+        [Tooltip("Prefab objek yang membuat tersedak (harus memiliki Rigidbody)")]
+        public GameObject chokingObjectPrefab;
+        [Tooltip("Posisi mulut korban tempat objek akan dimuntahkan")]
+        public Transform mouthTransform;
+        [Tooltip("Kekuatan dorongan objek saat dimuntahkan")]
+        public float spitForce = 2.5f;
+
+        [Header("Audio (Opsional)")]
+        [Tooltip("Komponen AudioSource untuk memutar efek suara")]
+        public AudioSource sfxSource;
+        [Tooltip("Efek suara saat hentakan (thrust) berhasil")]
+        public AudioClip thrustSound;
+        [Tooltip("Efek suara saat objektif ini selesai dan objek muntah")]
+        public AudioClip successSound;
 
         private int currentThrusts = 0;
         private bool isCompleted = false;
@@ -75,6 +93,25 @@ namespace MediProfen.Interactions
                 relay.onEnter = this.RelayTriggerEnter;
                 relay.onExit = this.RelayTriggerExit;
             }
+        }
+
+        private void SetCollidersVisibility(bool visible)
+        {
+            if (stomachCollider != null)
+            {
+                var renderer = stomachCollider.GetComponent<MeshRenderer>();
+                if (renderer != null) renderer.enabled = visible;
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (!isCompleted) SetCollidersVisibility(true);
+        }
+
+        private void OnDisable()
+        {
+            SetCollidersVisibility(false);
         }
 
         public void RelayTriggerEnter(Collider other)
@@ -297,6 +334,12 @@ namespace MediProfen.Interactions
                             victimAnimator.Play(thrustStateName, 0, 0f);
                         }
 
+                        // Putar suara hentakan
+                        if (sfxSource != null && thrustSound != null)
+                        {
+                            sfxSource.PlayOneShot(thrustSound);
+                        }
+
                         if (currentThrusts >= requiredThrusts)
                         {
                             CompleteThrust();
@@ -364,9 +407,35 @@ namespace MediProfen.Interactions
             isCompleted = true;
             Debug.Log("[AbdominalThrustManager] Objektif Abdominal Thrust Selesai!");
 
+            SetCollidersVisibility(false); // Matikan warna penanda
+
+            // Suara sukses
+            if (sfxSource != null && successSound != null)
+            {
+                sfxSource.PlayOneShot(successSound);
+            }
+
             foreach(var hand in trackedHands)
             {
                 RestoreHandVisual(hand);
+            }
+
+            // Memutar animasi terakhir (muntah)
+            if (victimAnimator != null && !string.IsNullOrEmpty(vomitStateName))
+            {
+                victimAnimator.CrossFade(vomitStateName, 0.2f);
+            }
+
+            // Memunculkan objek yang membuat tersedak dari mulut
+            if (chokingObjectPrefab != null && mouthTransform != null)
+            {
+                GameObject chokedObj = Instantiate(chokingObjectPrefab, mouthTransform.position, mouthTransform.rotation);
+                Rigidbody rb = chokedObj.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    // Tembakkan ke arah depan relatif terhadap wajah/mulut korban
+                    rb.AddForce(mouthTransform.forward * spitForce, ForceMode.Impulse);
+                }
             }
 
             ObjectiveEvents.RaiseTargetCompleted(objectiveTargetId, completionType);

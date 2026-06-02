@@ -52,6 +52,14 @@ namespace MediProfen.Interactions
         [Tooltip("Nama state animasi di Animator saat punggung dipukul (contoh: hit_pose)")]
         public string hitStateName = "hit_pose";
 
+        [Header("Audio (Opsional)")]
+        [Tooltip("Komponen AudioSource untuk memutar efek suara")]
+        public AudioSource sfxSource;
+        [Tooltip("Efek suara saat punggung berhasil dipukul")]
+        public AudioClip hitSound;
+        [Tooltip("Efek suara saat objektif ini selesai sepenuhnya (opsional)")]
+        public AudioClip successSound;
+
         private int currentBlows = 0;
         private bool isCompleted = false;
         private float lastStrikeTime = 0f;
@@ -93,6 +101,30 @@ namespace MediProfen.Interactions
                 relay.onEnter = this.RelayTriggerEnter;
                 relay.onExit = this.RelayTriggerExit;
             }
+        }
+
+        private void SetCollidersVisibility(bool visible)
+        {
+            if (chestCollider != null)
+            {
+                var renderer = chestCollider.GetComponent<MeshRenderer>();
+                if (renderer != null) renderer.enabled = visible;
+            }
+            if (backCollider != null)
+            {
+                var renderer = backCollider.GetComponent<MeshRenderer>();
+                if (renderer != null) renderer.enabled = visible;
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (!isCompleted) SetCollidersVisibility(true);
+        }
+
+        private void OnDisable()
+        {
+            SetCollidersVisibility(false);
         }
 
         public void RelayTriggerEnter(Collider other)
@@ -257,6 +289,12 @@ namespace MediProfen.Interactions
                     // Memaksa animasi dimainkan dari awal (frame 0) setiap kali dipukul
                     victimAnimator.Play(hitStateName, 0, 0f);
                 }
+                
+                // Putar efek suara pukulan
+                if (sfxSource != null && hitSound != null)
+                {
+                    sfxSource.PlayOneShot(hitSound);
+                }
 
                 Debug.Log($"[BackblowManager] Backblow sukses! {currentBlows}/{requiredBlows}");
 
@@ -341,6 +379,14 @@ namespace MediProfen.Interactions
             isCompleted = true;
             Debug.Log("[BackblowManager] Objektif Backblow Selesai!");
             
+            SetCollidersVisibility(false); // Matikan warna penanda
+
+            // Suara sukses
+            if (sfxSource != null && successSound != null)
+            {
+                sfxSource.PlayOneShot(successSound);
+            }
+
             // Kembalikan semua tangan visual yang mungkin masih nyangkut
             foreach(var hand in trackedHands)
             {
