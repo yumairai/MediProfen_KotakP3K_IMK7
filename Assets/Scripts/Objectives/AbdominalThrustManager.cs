@@ -71,6 +71,14 @@ namespace MediProfen.Interactions
         [Tooltip("Efek suara saat objektif ini selesai dan objek muntah")]
         public AudioClip successSound;
 
+        [Header("Choking Audio (Opsional)")]
+        [Tooltip("AudioSource untuk suara orang tersedak di awal scene")]
+        public AudioSource chokingLoopSource;
+        [Tooltip("Efek suara orang tersedak yang akan diputar looping")]
+        public AudioClip chokingLoopSound;
+        [Tooltip("Putar suara tersedak otomatis saat scene/object aktif")]
+        public bool playChokingLoopOnStart = true;
+
         private int currentThrusts = 0;
         private bool isCompleted = false;
         private float lastThrustTime = 0f;
@@ -107,6 +115,7 @@ namespace MediProfen.Interactions
         private void Start()
         {
             UpdateCounterUI();
+            StartChokingLoopIfNeeded();
 
             if (stomachCollider != null)
             {
@@ -481,6 +490,7 @@ namespace MediProfen.Interactions
 
             SetCollidersVisibility(false); // Matikan warna penanda
             SetMarkersVisibility(false);
+            StopChokingLoop();
 
             // Suara sukses
             if (sfxSource != null && successSound != null)
@@ -517,6 +527,30 @@ namespace MediProfen.Interactions
             }
 
             ObjectiveEvents.RaiseTargetCompleted(objectiveTargetId, completionType);
+        }
+
+        private void StartChokingLoopIfNeeded()
+        {
+            if (!playChokingLoopOnStart || chokingLoopSource == null || chokingLoopSound == null)
+            {
+                return;
+            }
+
+            chokingLoopSource.clip = chokingLoopSound;
+            chokingLoopSource.loop = true;
+
+            if (!chokingLoopSource.isPlaying)
+            {
+                chokingLoopSource.Play();
+            }
+        }
+
+        private void StopChokingLoop()
+        {
+            if (chokingLoopSource != null && chokingLoopSource.isPlaying)
+            {
+                chokingLoopSource.Stop();
+            }
         }
 
         private IEnumerator ReturnToIdleAfterVomit()

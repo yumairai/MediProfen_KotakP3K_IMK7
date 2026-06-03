@@ -68,12 +68,21 @@ namespace MediProfen.Interactions
         public AudioSource sfxSource;
         [Tooltip("Efek suara saat punggung berhasil dipukul")]
         public AudioClip hitSound;
+        [Tooltip("Efek suara reaksi orang saat backblow berhasil")]
+        public AudioClip victimBackblowSound;
         [Tooltip("Efek suara saat objektif ini selesai sepenuhnya (opsional)")]
         public AudioClip successSound;
+
+        [Header("Choking Audio (Opsional)")]
+        [Tooltip("AudioSource suara tersedak yang akan dimatikan saat objective backblow aktif")]
+        public AudioSource chokingLoopSource;
+        [Tooltip("Matikan suara tersedak saat objective backblow mulai aktif")]
+        public bool stopChokingLoopWhenObjectiveActive = true;
 
         private int currentBlows = 0;
         private bool isCompleted = false;
         private float lastStrikeTime = 0f;
+        private bool hasStoppedChokingLoop = false;
 
         private class TrackedHand
         {
@@ -170,7 +179,13 @@ namespace MediProfen.Interactions
 
         private void HandleObjectiveChanged(ObjectiveData objective, int index, int total)
         {
-            SetMarkersVisibility(!isCompleted && IsMatchingObjective(objective));
+            bool isActiveObjective = !isCompleted && IsMatchingObjective(objective);
+            SetMarkersVisibility(isActiveObjective);
+
+            if (isActiveObjective)
+            {
+                StopChokingLoopIfNeeded();
+            }
         }
 
         private void HandleScenarioCompleted(ScenarioData scenario)
@@ -181,7 +196,13 @@ namespace MediProfen.Interactions
         private void UpdateMarkersForCurrentObjective()
         {
             ObjectiveData objective = objectiveRunner != null ? objectiveRunner.CurrentObjective : null;
-            SetMarkersVisibility(!isCompleted && IsMatchingObjective(objective));
+            bool isActiveObjective = !isCompleted && IsMatchingObjective(objective);
+            SetMarkersVisibility(isActiveObjective);
+
+            if (isActiveObjective)
+            {
+                StopChokingLoopIfNeeded();
+            }
         }
 
         private bool IsMatchingObjective(ObjectiveData objective)
@@ -193,6 +214,21 @@ namespace MediProfen.Interactions
         {
             if (chestHoldMarker != null) chestHoldMarker.SetActive(visible);
             if (backblowMarker != null) backblowMarker.SetActive(visible);
+        }
+
+        private void StopChokingLoopIfNeeded()
+        {
+            if (!stopChokingLoopWhenObjectiveActive || hasStoppedChokingLoop)
+            {
+                return;
+            }
+
+            hasStoppedChokingLoop = true;
+
+            if (chokingLoopSource != null && chokingLoopSource.isPlaying)
+            {
+                chokingLoopSource.Stop();
+            }
         }
 
         public void RelayTriggerEnter(Collider other)
@@ -362,6 +398,11 @@ namespace MediProfen.Interactions
                 if (sfxSource != null && hitSound != null)
                 {
                     sfxSource.PlayOneShot(hitSound);
+                }
+
+                if (sfxSource != null && victimBackblowSound != null)
+                {
+                    sfxSource.PlayOneShot(victimBackblowSound);
                 }
 
                 Debug.Log($"[BackblowManager] Backblow sukses! {currentBlows}/{requiredBlows}");
