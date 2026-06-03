@@ -10,6 +10,12 @@ namespace MediProfen.UI
 {
     public class MenuScenarioSelector : MonoBehaviour
     {
+        [Header("Menu Canvases")]
+        [SerializeField] private GameObject canvasMain;
+        [SerializeField] private GameObject canvasSkenario;
+        [SerializeField] private GameObject canvasCredit;
+
+        [Header("Scenario Selection")]
         [SerializeField] private ScenarioDatabase database;
         [SerializeField] private Text titleText;
         [SerializeField] private Text descriptionText;
@@ -23,7 +29,31 @@ namespace MediProfen.UI
                 database = GameFlowManager.Instance.ScenarioDatabase;
             }
 
+            // Secara default, buka halaman utama saat game baru mulai
+            OpenMainMenu();
             RefreshUI();
+        }
+
+        public void OpenMainMenu()
+        {
+            if (canvasMain != null) canvasMain.SetActive(true);
+            if (canvasSkenario != null) canvasSkenario.SetActive(false);
+            if (canvasCredit != null) canvasCredit.SetActive(false);
+        }
+
+        public void OpenScenarioMenu()
+        {
+            if (canvasMain != null) canvasMain.SetActive(false);
+            if (canvasSkenario != null) canvasSkenario.SetActive(true);
+            if (canvasCredit != null) canvasCredit.SetActive(false);
+            RefreshUI();
+        }
+
+        public void OpenCreditMenu()
+        {
+            if (canvasMain != null) canvasMain.SetActive(false);
+            if (canvasSkenario != null) canvasSkenario.SetActive(false);
+            if (canvasCredit != null) canvasCredit.SetActive(true);
         }
 
         public void Next()

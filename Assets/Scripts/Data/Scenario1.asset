@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Scenario1
   m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Data.ScenarioData
   scenarioId: 001
-  displayName: Simulasi CPR
+  displayName: 'SKENARIO 1 : CPR'
   description: Ada seseorang yang tidak sadarkan diri di dalam kelas. Lakukan CPR
     agar korban kembali terbangun.
   sceneName: Scenario1

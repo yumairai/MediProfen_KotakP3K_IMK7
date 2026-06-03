@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Scenario2
   m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Data.ScenarioData
   scenarioId: 002
-  displayName: 'Simulasi Heimlich Maneuver '
-  description: Ada seseorang yang tersedak saat sedang makan, lakukan Heimlich Maneuver
+  displayName: 'SKENARIO 2 : Tersedak '
+  description: Ada seseorang yang tersedak saat sedang makan, lakukan pertolongan
     untuk menyelamatkan korban.
   sceneName: Scenario2
   objectives:
