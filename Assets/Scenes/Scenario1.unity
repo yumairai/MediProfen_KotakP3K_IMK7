@@ -8800,6 +8800,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1876249735}
   - component: {fileID: 1876249734}
+  - component: {fileID: 1876249736}
   m_Layer: 0
   m_Name: BGM_Manager
   m_TagString: Untagged
@@ -8819,7 +8820,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: c55ce3d3b9833454ab8496817d2ecbff, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -8919,6 +8920,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1876249736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876249733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a30474d7e41d4f4d9c61d2504f59dae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Core.BGMManager
+  objectiveRunner: {fileID: 1373170597}
+  bgmSource: {fileID: 1876249734}
+  normalBgm: {fileID: 8300000, guid: c55ce3d3b9833454ab8496817d2ecbff, type: 3}
+  completeBgm: {fileID: 8300000, guid: 1a394ddefd3d1bc4fbeb1156ca8de790, type: 3}
+  playNormalBgmOnStart: 1
+  fadeDuration: 1
+  normalVolume: 1
+  completeVolume: 1
 --- !u!54 &1884009698
 Rigidbody:
   m_ObjectHideFlags: 0
