@@ -210,7 +210,7 @@ namespace MediProfen.UI
                 if (scenarioCompleted || i < activeIndex)
                 {
                     // Berhasil: Hijau
-                    builder.AppendLine($"<color=#00C853>\u2713 {objective.Title}</color>");
+                    builder.AppendLine($"<color=#02FF00>\u2713 {objective.Title}</color>");
                 }
                 else if (hasActiveObjective && i == activeIndex)
                 {

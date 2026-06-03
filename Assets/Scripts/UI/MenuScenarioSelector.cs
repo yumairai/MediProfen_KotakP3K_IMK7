@@ -14,6 +14,7 @@ namespace MediProfen.UI
         [SerializeField] private GameObject canvasMain;
         [SerializeField] private GameObject canvasSkenario;
         [SerializeField] private GameObject canvasCredit;
+        [SerializeField] private GameObject canvasControl; // Canvas baru untuk tombol bantuan/kontrol
 
         [Header("Scenario Selection")]
         [SerializeField] private ScenarioDatabase database;
@@ -39,6 +40,7 @@ namespace MediProfen.UI
             if (canvasMain != null) canvasMain.SetActive(true);
             if (canvasSkenario != null) canvasSkenario.SetActive(false);
             if (canvasCredit != null) canvasCredit.SetActive(false);
+            if (canvasControl != null) canvasControl.SetActive(false);
         }
 
         public void OpenScenarioMenu()
@@ -46,6 +48,7 @@ namespace MediProfen.UI
             if (canvasMain != null) canvasMain.SetActive(false);
             if (canvasSkenario != null) canvasSkenario.SetActive(true);
             if (canvasCredit != null) canvasCredit.SetActive(false);
+            if (canvasControl != null) canvasControl.SetActive(false);
             RefreshUI();
         }
 
@@ -54,6 +57,15 @@ namespace MediProfen.UI
             if (canvasMain != null) canvasMain.SetActive(false);
             if (canvasSkenario != null) canvasSkenario.SetActive(false);
             if (canvasCredit != null) canvasCredit.SetActive(true);
+            if (canvasControl != null) canvasControl.SetActive(false);
+        }
+
+        public void OpenControlMenu()
+        {
+            if (canvasMain != null) canvasMain.SetActive(false);
+            if (canvasSkenario != null) canvasSkenario.SetActive(false);
+            if (canvasCredit != null) canvasCredit.SetActive(false);
+            if (canvasControl != null) canvasControl.SetActive(true);
         }
 
         public void Next()
