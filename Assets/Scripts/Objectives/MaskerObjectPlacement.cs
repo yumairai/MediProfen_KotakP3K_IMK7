@@ -3,14 +3,24 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class MaskerObjectPlacement : MonoBehaviour
 {
+    [Header("Socket")]
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRSocketInteractor socketInteractor;
+
+    [Header("Audio (Opsional)")]
+    [Tooltip("Komponen AudioSource untuk memutar efek suara")]
+    public AudioSource sfxSource;
+    [Tooltip("Efek suara saat masker berhasil dipasang")]
+    public AudioClip completionSound;
+
+    private bool isPlaced = false;
 
     private void OnEnable()
     {
         if (socketInteractor == null)
             socketInteractor = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactors.XRSocketInteractor>();
 
-        socketInteractor.selectEntered.AddListener(OnMaskerPlaced);
+        if (socketInteractor != null)
+            socketInteractor.selectEntered.AddListener(OnMaskerPlaced);
     }
 
     private void OnDisable()
@@ -21,22 +31,22 @@ public class MaskerObjectPlacement : MonoBehaviour
 
     private void OnMaskerPlaced(SelectEnterEventArgs args)
     {
-        // Set parent masker ke socket agar selalu ikut posisi socket
-        args.interactableObject.transform.SetParent(this.transform);
+        if (isPlaced) return;
+        isPlaced = true;
 
-        // Matikan XR Grab Interactable pada masker
-        var grab = args.interactableObject.transform.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
-        if (grab != null)
+        Transform maskerTransform = args.interactableObject.transform;
+
+        // Jangan disable XRGrabInteractable saat sedang dipegang socket.
+        // XRI bisa melepas object jika interactable/layer-nya dibuat tidak valid.
+        var grab = maskerTransform.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        if (grab != null && socketInteractor != null)
         {
-            grab.enabled = false;
-            grab.interactionLayers = 0; // Tidak bisa diinteraksi oleh interactor manapun
+            grab.interactionLayers = socketInteractor.interactionLayers;
         }
 
-        // Set Rigidbody menjadi kinematic agar tidak jatuh
-        var rb = args.interactableObject.transform.GetComponent<Rigidbody>();
-        if (rb != null)
+        if (sfxSource != null && completionSound != null)
         {
-            rb.isKinematic = true;
+            sfxSource.PlayOneShot(completionSound);
         }
     }
 }

@@ -31,6 +31,14 @@ namespace MediProfen.Interactions
         [Tooltip("Text UI untuk menampilkan counter CPR secara realtime (Mesh/Canvas)")]
         public TextMeshProUGUI counterText;
 
+        [Header("Audio (Opsional)")]
+        [Tooltip("Komponen AudioSource untuk memutar efek suara")]
+        public AudioSource sfxSource;
+        [Tooltip("Efek suara saat kompresi CPR berhasil dihitung")]
+        public AudioClip compressionSound;
+        [Tooltip("Efek suara saat objektif CPR selesai sepenuhnya (opsional)")]
+        public AudioClip successSound;
+
         [Header("Realistic CPR Settings")]
         [Tooltip("Offset lokal maksimum untuk gerakan tangan ke bawah (meter)")]
         public float maxHandsOffset = 0.10f;
@@ -339,6 +347,11 @@ namespace MediProfen.Interactions
                     UpdateCounterUI();
                     TriggerHapticFeedback(0.7f, 0.15f);
 
+                    if (sfxSource != null && compressionSound != null)
+                    {
+                        sfxSource.PlayOneShot(compressionSound);
+                    }
+
                     hasCompressedThisCycle = false;
 
                     if (currentCompressions >= requiredCompressions)
@@ -411,6 +424,11 @@ namespace MediProfen.Interactions
             if (counterText != null)
             {
                 counterText.gameObject.SetActive(false);
+            }
+
+            if (sfxSource != null && successSound != null)
+            {
+                sfxSource.PlayOneShot(successSound);
             }
 
             if (chestAnimator != null)
