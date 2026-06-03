@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using MediProfen.Objectives;
+using MediProfen.Data;
 using TMPro;
 
 namespace MediProfen.Interactions
@@ -27,11 +28,21 @@ namespace MediProfen.Interactions
         public string objectiveTargetId = "HeimlichManuver";
         public ObjectiveCompletionType completionType = ObjectiveCompletionType.Trigger;
 
+        [Header("Objective Runner (Optional)")]
+        [Tooltip("Runner objective pada scene. Jika kosong, akan dicari otomatis.")]
+        public ObjectiveRunner objectiveRunner;
+
         [Header("Colliders")]
         [Tooltip("Collider trigger untuk area dada yang harus di-grab")]
         public Collider chestCollider;
         [Tooltip("Collider trigger untuk area punggung yang akan dipukul")]
         public Collider backCollider;
+
+        [Header("Markers")]
+        [Tooltip("Marker tahan dada yang muncul saat objective Heimlich aktif")]
+        public GameObject chestHoldMarker;
+        [Tooltip("Marker tepuk punggung yang muncul saat objective Heimlich aktif")]
+        public GameObject backblowMarker;
 
         [Header("Settings")]
         public int requiredBlows = 5;
@@ -84,6 +95,11 @@ namespace MediProfen.Interactions
 
         private List<TrackedHand> trackedHands = new List<TrackedHand>();
 
+        private void Awake()
+        {
+            ResolveObjectiveRunner();
+        }
+
         private void Start()
         {
             UpdateCounterUI();
@@ -101,6 +117,8 @@ namespace MediProfen.Interactions
                 relay.onEnter = this.RelayTriggerEnter;
                 relay.onExit = this.RelayTriggerExit;
             }
+
+            UpdateMarkersForCurrentObjective();
         }
 
         private void SetCollidersVisibility(bool visible)
@@ -119,12 +137,62 @@ namespace MediProfen.Interactions
 
         private void OnEnable()
         {
+            ResolveObjectiveRunner();
+            if (objectiveRunner != null)
+            {
+                objectiveRunner.ObjectiveChanged += HandleObjectiveChanged;
+                objectiveRunner.ScenarioCompleted += HandleScenarioCompleted;
+            }
+
             if (!isCompleted) SetCollidersVisibility(true);
+            UpdateMarkersForCurrentObjective();
         }
 
         private void OnDisable()
         {
+            if (objectiveRunner != null)
+            {
+                objectiveRunner.ObjectiveChanged -= HandleObjectiveChanged;
+                objectiveRunner.ScenarioCompleted -= HandleScenarioCompleted;
+            }
+
             SetCollidersVisibility(false);
+            SetMarkersVisibility(false);
+        }
+
+        private void ResolveObjectiveRunner()
+        {
+            if (objectiveRunner == null)
+            {
+                objectiveRunner = FindAnyObjectByType<ObjectiveRunner>();
+            }
+        }
+
+        private void HandleObjectiveChanged(ObjectiveData objective, int index, int total)
+        {
+            SetMarkersVisibility(!isCompleted && IsMatchingObjective(objective));
+        }
+
+        private void HandleScenarioCompleted(ScenarioData scenario)
+        {
+            SetMarkersVisibility(false);
+        }
+
+        private void UpdateMarkersForCurrentObjective()
+        {
+            ObjectiveData objective = objectiveRunner != null ? objectiveRunner.CurrentObjective : null;
+            SetMarkersVisibility(!isCompleted && IsMatchingObjective(objective));
+        }
+
+        private bool IsMatchingObjective(ObjectiveData objective)
+        {
+            return objective != null && objective.Matches(objectiveTargetId, completionType);
+        }
+
+        private void SetMarkersVisibility(bool visible)
+        {
+            if (chestHoldMarker != null) chestHoldMarker.SetActive(visible);
+            if (backblowMarker != null) backblowMarker.SetActive(visible);
         }
 
         public void RelayTriggerEnter(Collider other)
@@ -380,6 +448,7 @@ namespace MediProfen.Interactions
             Debug.Log("[BackblowManager] Objektif Backblow Selesai!");
             
             SetCollidersVisibility(false); // Matikan warna penanda
+            SetMarkersVisibility(false);
 
             // Suara sukses
             if (sfxSource != null && successSound != null)

@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using MediProfen.Objectives;
+using MediProfen.Data;
 using TMPro;
 
 namespace MediProfen.Interactions
@@ -12,9 +14,17 @@ namespace MediProfen.Interactions
         public string objectiveTargetId = "AbdominalThrust";
         public ObjectiveCompletionType completionType = ObjectiveCompletionType.Trigger;
 
+        [Header("Objective Runner (Optional)")]
+        [Tooltip("Runner objective pada scene. Jika kosong, akan dicari otomatis.")]
+        public ObjectiveRunner objectiveRunner;
+
         [Header("Collider Settings")]
         [Tooltip("Collider trigger untuk area perut korban")]
         public Collider stomachCollider;
+
+        [Header("Markers")]
+        [Tooltip("Marker hentak perut yang muncul saat objective Abdominal Thrust aktif")]
+        public GameObject stomachThrustMarker;
 
         [Header("Thrust Settings")]
         public int requiredThrusts = 5;
@@ -38,6 +48,12 @@ namespace MediProfen.Interactions
         public string thrustStateName = "thrust_hit";
         [Tooltip("Nama state animasi saat objektif selesai dan memuntahkan objek")]
         public string vomitStateName = "vomit_pose";
+        [Tooltip("Nama state animasi idle setelah animasi objek keluar selesai")]
+        public string postVomitIdleStateName = "";
+        [Tooltip("Jeda sebelum kembali ke idle setelah animasi objek keluar dimulai")]
+        public float postVomitIdleDelay = 2.0f;
+        [Tooltip("Matikan Animator setelah animasi objek keluar selesai agar tidak kembali ke animasi tersedak")]
+        public bool disableAnimatorAfterVomit = true;
 
         [Header("Choking Object Spawner (Selesai Objective)")]
         [Tooltip("Prefab objek yang membuat tersedak (harus memiliki Rigidbody)")]
@@ -83,6 +99,11 @@ namespace MediProfen.Interactions
         private Vector3 grabStartAveragePos;
         private bool hasThrustThisCycle = false;
 
+        private void Awake()
+        {
+            ResolveObjectiveRunner();
+        }
+
         private void Start()
         {
             UpdateCounterUI();
@@ -93,6 +114,8 @@ namespace MediProfen.Interactions
                 relay.onEnter = this.RelayTriggerEnter;
                 relay.onExit = this.RelayTriggerExit;
             }
+
+            UpdateMarkersForCurrentObjective();
         }
 
         private void SetCollidersVisibility(bool visible)
@@ -106,12 +129,61 @@ namespace MediProfen.Interactions
 
         private void OnEnable()
         {
+            ResolveObjectiveRunner();
+            if (objectiveRunner != null)
+            {
+                objectiveRunner.ObjectiveChanged += HandleObjectiveChanged;
+                objectiveRunner.ScenarioCompleted += HandleScenarioCompleted;
+            }
+
             if (!isCompleted) SetCollidersVisibility(true);
+            UpdateMarkersForCurrentObjective();
         }
 
         private void OnDisable()
         {
+            if (objectiveRunner != null)
+            {
+                objectiveRunner.ObjectiveChanged -= HandleObjectiveChanged;
+                objectiveRunner.ScenarioCompleted -= HandleScenarioCompleted;
+            }
+
             SetCollidersVisibility(false);
+            SetMarkersVisibility(false);
+        }
+
+        private void ResolveObjectiveRunner()
+        {
+            if (objectiveRunner == null)
+            {
+                objectiveRunner = FindAnyObjectByType<ObjectiveRunner>();
+            }
+        }
+
+        private void HandleObjectiveChanged(ObjectiveData objective, int index, int total)
+        {
+            SetMarkersVisibility(!isCompleted && IsMatchingObjective(objective));
+        }
+
+        private void HandleScenarioCompleted(ScenarioData scenario)
+        {
+            SetMarkersVisibility(false);
+        }
+
+        private void UpdateMarkersForCurrentObjective()
+        {
+            ObjectiveData objective = objectiveRunner != null ? objectiveRunner.CurrentObjective : null;
+            SetMarkersVisibility(!isCompleted && IsMatchingObjective(objective));
+        }
+
+        private bool IsMatchingObjective(ObjectiveData objective)
+        {
+            return objective != null && objective.Matches(objectiveTargetId, completionType);
+        }
+
+        private void SetMarkersVisibility(bool visible)
+        {
+            if (stomachThrustMarker != null) stomachThrustMarker.SetActive(visible);
         }
 
         public void RelayTriggerEnter(Collider other)
@@ -408,6 +480,7 @@ namespace MediProfen.Interactions
             Debug.Log("[AbdominalThrustManager] Objektif Abdominal Thrust Selesai!");
 
             SetCollidersVisibility(false); // Matikan warna penanda
+            SetMarkersVisibility(false);
 
             // Suara sukses
             if (sfxSource != null && successSound != null)
@@ -424,6 +497,11 @@ namespace MediProfen.Interactions
             if (victimAnimator != null && !string.IsNullOrEmpty(vomitStateName))
             {
                 victimAnimator.CrossFade(vomitStateName, 0.2f);
+
+                if (disableAnimatorAfterVomit || !string.IsNullOrEmpty(postVomitIdleStateName))
+                {
+                    StartCoroutine(ReturnToIdleAfterVomit());
+                }
             }
 
             // Memunculkan objek yang membuat tersedak dari mulut
@@ -439,6 +517,21 @@ namespace MediProfen.Interactions
             }
 
             ObjectiveEvents.RaiseTargetCompleted(objectiveTargetId, completionType);
+        }
+
+        private IEnumerator ReturnToIdleAfterVomit()
+        {
+            yield return new WaitForSeconds(postVomitIdleDelay);
+
+            if (victimAnimator != null && !string.IsNullOrEmpty(postVomitIdleStateName))
+            {
+                victimAnimator.CrossFade(postVomitIdleStateName, 0.2f);
+            }
+
+            if (victimAnimator != null && disableAnimatorAfterVomit)
+            {
+                victimAnimator.enabled = false;
+            }
         }
     }
 }

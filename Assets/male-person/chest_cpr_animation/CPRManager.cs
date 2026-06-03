@@ -38,6 +38,12 @@ namespace MediProfen.Interactions
         public AudioClip compressionSound;
         [Tooltip("Efek suara saat objektif CPR selesai sepenuhnya (opsional)")]
         public AudioClip successSound;
+        [Tooltip("Komponen AudioSource untuk suara napas setelah CPR selesai")]
+        public AudioSource breathingSource;
+        [Tooltip("Efek suara napas pasien setelah CPR selesai")]
+        public AudioClip breathingSound;
+        [Tooltip("Jeda sebelum suara napas diputar setelah CPR selesai")]
+        public float breathingStartDelay = 1.0f;
 
         [Header("Realistic CPR Settings")]
         [Tooltip("Offset lokal maksimum untuk gerakan tangan ke bawah (meter)")]
@@ -79,6 +85,16 @@ namespace MediProfen.Interactions
 
         private void Start()
         {
+            if (sfxSource == null)
+            {
+                sfxSource = GetComponent<AudioSource>();
+            }
+
+            if (breathingSource == null)
+            {
+                breathingSource = sfxSource;
+            }
+
             // Update teks awal, tetapi biarkan status terlihat/tidaknya diatur dari Inspector 
             // atau dijadikan child dari cprIndicator
             if (counterText != null)
@@ -428,7 +444,22 @@ namespace MediProfen.Interactions
 
             if (sfxSource != null && successSound != null)
             {
-                sfxSource.PlayOneShot(successSound);
+                PlayOneShotDetached(successSound, sfxSource);
+            }
+            else
+            {
+                Debug.LogWarning("[CPRManager] Success sound tidak diputar. Pastikan Sfx Source dan Success Sound sudah diisi.");
+            }
+
+            if (breathingSource != null && breathingSound != null)
+            {
+                breathingSource.clip = breathingSound;
+                breathingSource.loop = true;
+                breathingSource.PlayDelayed(breathingStartDelay);
+            }
+            else
+            {
+                Debug.LogWarning("[CPRManager] Breathing sound tidak diputar. Pastikan Breathing Source dan Breathing Sound sudah diisi.");
             }
 
             if (chestAnimator != null)
@@ -438,6 +469,26 @@ namespace MediProfen.Interactions
                 Debug.Log("[CPRManager] CPRDone Triggered.");
             }
             ObjectiveEvents.RaiseTargetCompleted(cprObjectiveTargetId, completionType);
+        }
+
+        private void PlayOneShotDetached(AudioClip clip, AudioSource referenceSource)
+        {
+            if (clip == null) return;
+
+            GameObject audioObject = new GameObject($"OneShotAudio_{clip.name}");
+            audioObject.transform.position = referenceSource != null ? referenceSource.transform.position : transform.position;
+
+            AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+            if (referenceSource != null)
+            {
+                audioSource.outputAudioMixerGroup = referenceSource.outputAudioMixerGroup;
+                audioSource.volume = referenceSource.volume;
+                audioSource.pitch = referenceSource.pitch;
+            }
+
+            audioSource.spatialBlend = 0f;
+            audioSource.PlayOneShot(clip);
+            Destroy(audioObject, clip.length + 0.1f);
         }
     }
 }

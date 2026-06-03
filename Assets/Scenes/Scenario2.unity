@@ -1870,8 +1870,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Interactions.BackblowManager
   objectiveTargetId: HeimlichManuver
   completionType: 3
+  objectiveRunner: {fileID: 988056331}
   chestCollider: {fileID: 1519086627}
   backCollider: {fileID: 1949081092}
+  chestHoldMarker: {fileID: 1324460440}
+  backblowMarker: {fileID: 481893208}
   requiredBlows: 10
   cooldownTime: 0.5
   gripThreshold: 0.5
@@ -1897,7 +1900,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MediProfen.Interactions.AbdominalThrustManager
   objectiveTargetId: AbdominalThrust
   completionType: 3
+  objectiveRunner: {fileID: 988056331}
   stomachCollider: {fileID: 1867933693}
+  stomachThrustMarker: {fileID: 1390871627}
   requiredThrusts: 10
   gripThreshold: 0.5
   pullDistanceThreshold: 0.01
