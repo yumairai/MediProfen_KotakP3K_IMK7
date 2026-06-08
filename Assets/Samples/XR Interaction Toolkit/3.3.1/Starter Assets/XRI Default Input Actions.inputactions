@@ -886,7 +886,40 @@
                 {
                     "name": "",
                     "id": "371c3dec-3607-4ca4-b604-fa43a4a450c2",
-                    "path": "",
+                    "path": "<XRController>{LeftHand}/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "31975b30-99ae-485c-8e95-b3b08d62fe85",
+                    "path": "<XRController>{LeftHand}/{MenuButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b401d3ee-7856-4f0e-8a53-ceeb72cc2197",
+                    "path": "<XRController>{LeftHand}/{Menu}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ff13c713-9dd3-4952-8ab2-667929f6bf9a",
+                    "path": "<XRController>{LeftHand}/{PrimaryAction}",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

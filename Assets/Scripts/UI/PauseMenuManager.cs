@@ -7,7 +7,7 @@ namespace MediProfen.UI
     public class PauseMenuManager : MonoBehaviour
     {
         [Header("Pengaturan Input")]
-        [Tooltip("Pilih tombol dari Input Action (Misal: XRI LeftHand/Menu atau Primary Button)")]
+        [Tooltip("Pilih tombol dari Input Action (Misal: XRI Left/Menu)")]
         [SerializeField] private InputActionReference pauseButton;
 
         [Header("UI Canvas & Panels")]
@@ -25,89 +25,107 @@ namespace MediProfen.UI
         [SerializeField] private float spawnDistance = 1.5f;
 
         private bool isPaused = false;
+        // Digunakan agar satu kali tekan tidak memicu toggle berkali-kali
+        private bool wasButtonHeldLastFrame = false;
 
         private void OnEnable()
         {
-            // Mengaktifkan pendeteksi tombol
             if (pauseButton != null && pauseButton.action != null)
             {
+                // Aktifkan Action Map induk agar sinyal controller bisa mengalir
+                pauseButton.action.actionMap?.Enable();
                 pauseButton.action.Enable();
-                pauseButton.action.performed += OnPauseButtonPressed;
+                Debug.Log($"[PauseMenuManager] Input terdaftar: '{pauseButton.action.name}' | Aktif: {pauseButton.action.enabled}");
+            }
+            else
+            {
+                Debug.LogWarning("[PauseMenuManager] Pause Button belum diisi di Inspector!");
             }
         }
 
         private void OnDisable()
         {
-            // Mematikan pendeteksi tombol saat script mati
-            if (pauseButton != null && pauseButton.action != null)
-            {
-                pauseButton.action.performed -= OnPauseButtonPressed;
-            }
+            // Tidak perlu menonaktifkan action map di sini agar controller lain tetap berjalan
         }
 
         private void Start()
         {
-            // Sembunyikan menu saat game baru mulai
             if (pauseMenuCanvas != null)
             {
                 pauseMenuCanvas.SetActive(false);
             }
         }
 
-        private void OnPauseButtonPressed(InputAction.CallbackContext context)
+        private void Update()
         {
-            TogglePause();
+            if (pauseButton == null || pauseButton.action == null) return;
+
+            // Cek apakah tombol sedang ditekan frame ini
+            bool isButtonHeld = pauseButton.action.IsPressed();
+
+            // Hanya toggle saat tombol baru ditekan (bukan terus-terusan saat ditahan)
+            if (isButtonHeld && !wasButtonHeldLastFrame)
+            {
+                Debug.Log("[PauseMenuManager] Tombol Pause terdeteksi!");
+                TogglePause();
+            }
+
+            wasButtonHeldLastFrame = isButtonHeld;
         }
 
         public void TogglePause()
         {
-            isPaused = !isPaused;
-
             if (isPaused)
             {
-                OpenPauseMenu();
+                ResumeGame();
             }
             else
             {
-                ResumeGame();
+                OpenPauseMenu();
             }
         }
 
         private void OpenPauseMenu()
         {
             isPaused = true;
-            Time.timeScale = 0f; // Menghentikan waktu/fisika di dalam game
+            Time.timeScale = 0f; // Hentikan waktu/fisika game
 
             if (pauseMenuCanvas != null)
             {
                 pauseMenuCanvas.SetActive(true);
-                
-                // Menempatkan menu tepat di depan posisi wajah pemain saat ini
+
+                // Munculkan menu tepat di depan wajah pemain
                 if (headTransform != null)
                 {
-                    Vector3 spawnPos = headTransform.position + (headTransform.forward * spawnDistance);
-                    spawnPos.y = headTransform.position.y; // Buat tingginya sejajar mata
-                    
+                    Vector3 forward = headTransform.forward;
+                    forward.y = 0f;
+                    forward.Normalize();
+
+                    Vector3 spawnPos = headTransform.position + (forward * spawnDistance);
+                    spawnPos.y = headTransform.position.y;
+
                     pauseMenuCanvas.transform.position = spawnPos;
-                    
-                    // Memutar menu agar menghadap ke pemain
                     pauseMenuCanvas.transform.LookAt(headTransform);
-                    pauseMenuCanvas.transform.Rotate(0, 180, 0); // Dibalik agar teksnya tidak mirror
+                    pauseMenuCanvas.transform.Rotate(0, 180, 0);
                 }
 
                 ShowMainPanel();
             }
+
+            Debug.Log("[PauseMenuManager] Game di-pause.");
         }
 
         public void ResumeGame()
         {
             isPaused = false;
-            Time.timeScale = 1f; // Kembalikan waktu normal agar game berjalan lagi
+            Time.timeScale = 1f; // Kembalikan waktu normal
 
             if (pauseMenuCanvas != null)
             {
                 pauseMenuCanvas.SetActive(false);
             }
+
+            Debug.Log("[PauseMenuManager] Game dilanjutkan.");
         }
 
         public void ShowMainPanel()
@@ -124,8 +142,9 @@ namespace MediProfen.UI
 
         public void ReturnToMainMenu()
         {
-            Time.timeScale = 1f; // Sangat penting! Waktu wajib dikembalikan normal sebelum pindah scene
-            
+            // Wajib kembalikan timeScale sebelum pindah scene!
+            Time.timeScale = 1f;
+
             if (GameFlowManager.Instance != null)
             {
                 GameFlowManager.Instance.ReturnToMenu();

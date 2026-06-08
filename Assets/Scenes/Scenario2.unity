@@ -1878,7 +1878,7 @@ MonoBehaviour:
   backCollider: {fileID: 1949081092}
   chestHoldMarker: {fileID: 1324460440}
   backblowMarker: {fileID: 481893208}
-  requiredBlows: 10
+  requiredBlows: 30
   cooldownTime: 0.5
   gripThreshold: 0.5
   counterText: {fileID: 0}
@@ -1909,7 +1909,7 @@ MonoBehaviour:
   objectiveRunner: {fileID: 988056331}
   stomachCollider: {fileID: 1867933693}
   stomachThrustMarker: {fileID: 1390871627}
-  requiredThrusts: 10
+  requiredThrusts: 30
   gripThreshold: 0.5
   pullDistanceThreshold: 0.01
   cooldownTime: 0.5
