@@ -3127,7 +3127,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1584818384}
+      - m_Target: {fileID: 1584818385}
         m_TargetAssemblyTypeName: MediProfen.UI.PauseMenuManager, Assembly-CSharp
         m_MethodName: ReturnToMainMenu
         m_Mode: 1
@@ -3425,7 +3425,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1584818384}
+      - m_Target: {fileID: 1584818385}
         m_TargetAssemblyTypeName: MediProfen.UI.PauseMenuManager, Assembly-CSharp
         m_MethodName: ResumeGame
         m_Mode: 1
@@ -5925,7 +5925,7 @@ GameObject:
   - component: {fileID: 1437269046}
   - component: {fileID: 1437269045}
   m_Layer: 5
-  m_Name: Kontrol
+  m_Name: Play (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5995,7 +5995,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1584818384}
+      - m_Target: {fileID: 1584818385}
         m_TargetAssemblyTypeName: MediProfen.UI.PauseMenuManager, Assembly-CSharp
         m_MethodName: ShowControlPanel
         m_Mode: 1
@@ -6076,7 +6076,7 @@ GameObject:
   - component: {fileID: 1480532159}
   - component: {fileID: 1480532158}
   m_Layer: 5
-  m_Name: Exit Control
+  m_Name: Play (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6146,7 +6146,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1584818384}
+      - m_Target: {fileID: 1584818385}
         m_TargetAssemblyTypeName: MediProfen.UI.PauseMenuManager, Assembly-CSharp
         m_MethodName: ShowMainPanel
         m_Mode: 1
@@ -6542,7 +6542,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1584818383}
-  - component: {fileID: 1584818384}
+  - component: {fileID: 1584818385}
   m_Layer: 5
   m_Name: PauseManager
   m_TagString: Untagged
@@ -6557,19 +6557,19 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1584818382}
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.05}
-  m_LocalScale: {x: 0.0015000005, y: 0.0015, z: 0.0015000005}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1849648872}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0004471142, y: 1586.6667}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1584818384
+--- !u!114 &1584818385
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8254,6 +8254,7 @@ RectTransform:
   m_Children:
   - {fileID: 1831899194}
   - {fileID: 92732257}
+  - {fileID: 1584818383}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -14677,5 +14678,4 @@ SceneRoots:
   - {fileID: 74893192}
   - {fileID: 1740214099}
   - {fileID: 1876249735}
-  - {fileID: 1584818383}
   - {fileID: 1849648872}
